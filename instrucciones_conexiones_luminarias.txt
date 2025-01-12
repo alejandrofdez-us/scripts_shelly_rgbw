@@ -1,0 +1,35 @@
+Instalación luminarias salón:
+
+Materiales:
+	1 simon 100 PWM regulador
+	2 simon 100 conmutador pulsante
+	4 shelly RGBWPM
+	1 fuente de alimentación 24V 200W
+	4 focos RGBW 24V
+
+Conexiones:
+	Simon PWM regulador:
+		V+ <-> V+ fuente de alimentación
+		V- <-> V- fuente de alimentación
+		LED- <-> entrada I4 de los 4 shelly RGBW PM
+		⊓ (conmutador) <-> Salida 2 de ambos conmutadores que estarán conectados entre si.
+
+	Cada Shelly RGBWPM:
+		WRGB <-> WRGB de su correspondiente foco
+		I4 <-> LED- del simon pwm
+		⊥ (tierra) <-> V- fuente de alimentación
+		+ <-> V+ fuente de alimentación y al cable negro de su correspondiente foco
+		I3, I2, I1 <-> sin conectar
+
+	Cada conmutador:
+		Entrada 1 <-> V- fuente de alimentación (pueden conectarse entre si)
+		Salida 2 <-> llegan ambas a la entrada ⊓ (conmutador) del simon pwm regulador
+
+	Cada foco RGBW
+		Los cables RGBW a las entradas RGBW de su correspondiente shelly.
+		El cable negro al + de su shelly
+
+	La fuente de alimentación
+		Recibe AC
+		Salidas V+ <-> shelly + y simon pwm V+
+		Salidas V- <-> shelly ⊥, simon pwm V- y conmutadores entrada 1
