@@ -3,7 +3,6 @@ let lastBrightness = 0; // Último nivel de brillo aplicado
 let lastWhite = 0; // Último nivel de blanco aplicado
 let pwmValues = []; // Array para almacenar las últimas lecturas de PWM
 const SMOOTHING_WINDOW = 10; // Número de lecturas a promediar
-const ALPHA = 0.2; // Factor de suavizado para el filtro exponencial
 let isSettingInProgress = false; // Bandera para controlar solo las llamadas de ajuste
 
 // Función para agregar un valor PWM al array y limitar el tamaño
