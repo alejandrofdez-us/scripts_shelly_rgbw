@@ -5,6 +5,10 @@ let colorResetTimestamp = null; // Última marca de tiempo del apagado completo
 const GAMMA = 2; // Valor de gamma para la curva
 const COLOR_ON_NEXT_ON = { red: 20, green: 20, blue: 0 }; // Color específico (cálido)
 
+// Umbral mínimo para evitar flickering
+const PWM_MIN_THRESHOLD = 20; // Porcentaje mínimo del PWM de entrada
+const BRIGHTNESS_MIN_OUTPUT = 1; // Porcentaje de brillo mínimo de salida forzado
+
 // Función para aplicar corrección gamma
 function applyGammaCurve(value, gamma) {
     return Math.round(100 * Math.pow(value / 100, gamma));
@@ -57,6 +61,22 @@ function setBrightnessAndWhite(brightness, white, applyColor) {
     });
 }
 
+function applyMinimumWhite(pwmValue) {
+    if (isSettingInProgress) return;
+    isSettingInProgress = true;
+
+    Shelly.call("RGBW.Set", {
+        id: 0,
+        on: true,
+        mode: "white",
+        brightness: 0,
+        white: 1,
+        transition_duration: 1
+    }, function () {
+        isSettingInProgress = false;
+    });
+}
+
 // Timer para leer el PWM y ajustar el foco
 Timer.set(200 /* cada 200ms */, true /* repetitivo */, function () {
     Shelly.call("Input.GetStatus", { id: 3 }, function (res, err) {
@@ -77,8 +97,15 @@ Timer.set(200 /* cada 200ms */, true /* repetitivo */, function () {
         }
         colorResetTimestamp = null; // Resetear el contador de apagado
 
-        // Aplicar corrección gamma
-        let gammaCorrected = applyGammaCurve(pwmValue, GAMMA);
+        // Aplicar valor fijo si está por debajo del umbral para evitar flickering
+        let gammaCorrected;
+        if (pwmValue < PWM_MIN_THRESHOLD) {
+            applyMinimumWhite();
+            return;
+        } else {
+            // Aplicar corrección gamma
+            gammaCorrected = applyGammaCurve(pwmValue, GAMMA);
+        }
 
         // Calcular valores de brillo y blanco
         let brightness = Math.round((gammaCorrected / 100) * 100); // Convertir a rango 0-100
